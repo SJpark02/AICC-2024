@@ -6,7 +6,7 @@ import os
 import math
 
 # Google Cloud Speech 클라이언트 설정
-service_account_file = 'C:\\Users\\82105\\Desktop\\AICC\\API_Key\\tactile-oxygen-417211-7dffaebbb24d.json'
+service_account_file = 'GCP API KEY'
 credentials = service_account.Credentials.from_service_account_file(service_account_file)
 client = speech.SpeechClient(credentials=credentials)
 
