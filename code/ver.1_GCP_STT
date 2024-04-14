@@ -1,0 +1,96 @@
+from pydub import AudioSegment
+from google.cloud import speech
+from google.oauth2 import service_account
+import glob
+import os
+import math
+
+# Google Cloud Speech 클라이언트 설정
+service_account_file = 'C:\\Users\\82105\\Desktop\\AICC\\API_Key\\tactile-oxygen-417211-7dffaebbb24d.json'
+credentials = service_account.Credentials.from_service_account_file(service_account_file)
+client = speech.SpeechClient(credentials=credentials)
+
+# MP3 파일이 포함된 디렉토리
+mp3_folder = 'D:\\Data\\AICC_data\\test_data\\'
+mp3_files = glob.glob(mp3_folder + '*.mp3')
+
+# 분할된 파일을 저장할 새 디렉토리
+output_folder = 'C:\\Users\\82105\\Desktop\\AICC\\Data_Convert\\'
+os.makedirs(output_folder, exist_ok=True)  # 디렉토리가 없다면 생성
+
+# 분할 및 저장
+for mp3_file in mp3_files:
+    # 오디오 파일 로드
+    audio = AudioSegment.from_file(mp3_file)
+    
+    # 오디오의 총 길이(밀리초)
+    duration = len(audio)
+    
+    # 40초 간격으로 분할 (40초 = 40000밀리초)
+    interval = 40000
+    
+    # 분할된 파일의 수 계산
+    num_clips = math.ceil(duration / interval)
+    
+    # 파일 기본 이름 설정
+    base_name = os.path.splitext(os.path.basename(mp3_file))[0]
+    
+    # 분할 및 저장
+    for i in range(num_clips):
+        # 시작 및 종료 시간 계산 (밀리초)
+        start_time = i * interval
+        end_time = min((i + 1) * interval, duration)
+        
+        # 분할된 오디오 클립 생성
+        audio_clip = audio[start_time:end_time]
+        
+        # 파일 이름 구성
+        output_filename = f"{base_name}_{i + 1:02}.mp3"
+        output_path = os.path.join(output_folder, output_filename)
+        
+        # MP3 파일로 저장
+        audio_clip.export(output_path, format="mp3")
+
+print("분할 완료: 모든 파일이 생성되었습니다.")
+
+# 분할 완료 후, 분할된 파일들이 저장된 디렉토리에서 파일 목록을 불러옵니다.
+mp3_files = glob.glob(output_folder + '*.mp3') 
+
+
+# STT 결과를 저장하는 디렉토리
+STT_folder = 'C:\\Users\\82105\\Desktop\\AICC\\Data_STT'
+
+# 출력 디렉토리가 존재하는지 확인합니다
+os.makedirs(STT_folder, exist_ok=True)
+
+
+# 분할된 모든 MP3 파일을 순회하며 처리
+for mp3_file in mp3_files:
+    # 파일 확장자를 제외하고 전체 이름을 유지합니다.
+    base_name = os.path.basename(mp3_file)[:-4]  # ".mp3" 확장자 제거
+    sound = AudioSegment.from_mp3(mp3_file)
+    sound = sound.set_channels(1)  # Convert to mono
+    temp_file = "temp_mono.mp3"
+    sound.export(temp_file, format="mp3")
+
+    with open(temp_file, "rb") as audio_file:
+        content = audio_file.read()
+
+    audio = speech.RecognitionAudio(content=content)
+    config = speech.RecognitionConfig(
+        encoding=speech.RecognitionConfig.AudioEncoding.ENCODING_UNSPECIFIED,
+        sample_rate_hertz=44100,
+        language_code="en-US"
+    )
+
+    try:
+        response = client.recognize(config=config, audio=audio)
+        with open(os.path.join(STT_folder, f"{base_name}.txt"), 'w') as file:
+            for result in response.results:
+                transcript = result.alternatives[0].transcript
+                file.write(transcript + '\n')
+    except Exception as e:
+        print(f"Error processing file {mp3_file}: {e}")
+
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
