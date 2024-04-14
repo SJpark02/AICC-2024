@@ -11,11 +11,11 @@ credentials = service_account.Credentials.from_service_account_file(service_acco
 client = speech.SpeechClient(credentials=credentials)
 
 # MP3 파일이 포함된 디렉토리
-mp3_folder = 'D:\\Data\\AICC_data\\test_data\\'
+mp3_folder = 'MP3 파일이 포함된 디렉토리 경로'
 mp3_files = glob.glob(mp3_folder + '*.mp3')
 
 # 분할된 파일을 저장할 새 디렉토리
-output_folder = 'C:\\Users\\82105\\Desktop\\AICC\\Data_Convert\\'
+output_folder = '분할된 파일을 저장할 새 디렉토리 경로'
 os.makedirs(output_folder, exist_ok=True)  # 디렉토리가 없다면 생성
 
 # 분할 및 저장
@@ -58,7 +58,7 @@ mp3_files = glob.glob(output_folder + '*.mp3')
 
 
 # STT 결과를 저장하는 디렉토리
-STT_folder = 'C:\\Users\\82105\\Desktop\\AICC\\Data_STT'
+STT_folder = 'STT 결과를 저장하는 디렉토리 경로'
 
 # 출력 디렉토리가 존재하는지 확인합니다
 os.makedirs(STT_folder, exist_ok=True)
