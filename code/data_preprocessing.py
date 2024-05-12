@@ -1,8 +1,8 @@
 import os
 
 # Define the directory containing the original files and the directory to store results
-input_directory = '2024_stt'
-output_directory = '2024_stt_result'
+input_directory = '스크립트 완료한 data folder path'
+output_directory = '타임스탬프 및 특수문자 제거한 data folder path'
 
 # Create the output directory if it does not exist
 os.makedirs(output_directory, exist_ok=True)
