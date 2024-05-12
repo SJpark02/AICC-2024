@@ -1,8 +1,14 @@
 import os
+import re
+
+def clean_text(text):
+    # Extended regex pattern to explicitly remove musical note symbols (♪) alongside other special characters
+    pattern = re.compile(r'[^\w\s]|[\u266A]', re.UNICODE)  # \u266A is the Unicode for the musical note symbol
+    return pattern.sub('', text)
 
 # Define the directory containing the original files and the directory to store results
-input_directory = '스크립트 완료한 data folder path'
-output_directory = '타임스탬프 및 특수문자 제거한 data folder path'
+input_directory = '2024_stt'
+output_directory = '2024_stt_result'
 
 # Create the output directory if it does not exist
 os.makedirs(output_directory, exist_ok=True)
@@ -17,7 +23,7 @@ for filename in os.listdir(input_directory):
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        # Process the text to remove timestamps and special characters, then join them into a single paragraph
+        # Process the text to remove timestamps, special characters including musical notes, then join them into a single paragraph
         processed_text = []
         current_sentence = []
 
@@ -27,8 +33,8 @@ for filename in os.listdir(input_directory):
             else:
                 text_part = line.strip()
 
-            # Remove unwanted characters
-            text_part = text_part.replace('>>>', '').replace('>>', '').strip()
+            # Remove '>>>', '>>', and additional special characters including musical notes
+            text_part = clean_text(text_part.replace('>>>', '').replace('>>', '').strip())
             
             if text_part:
                 current_sentence.append(text_part)
