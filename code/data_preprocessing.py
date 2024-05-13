@@ -2,9 +2,12 @@ import os
 import re
 
 def clean_text(text):
-    # Extended regex pattern to explicitly remove musical note symbols (♪) alongside other special characters
-    pattern = re.compile(r'[^\w\s]|[\u266A]', re.UNICODE)  # \u266A is the Unicode for the musical note symbol
-    return pattern.sub('', text)
+    # Regex pattern to remove special characters except periods (.)
+    # It specifically targets musical note symbols (♪) and other unwanted non-alphanumeric symbols
+    pattern = re.compile(r'[^\w\s\.]|[\u266A]', re.UNICODE)  # Keeps periods, removes musical notes and other non-word, non-space characters
+    # Convert text to lowercase before removing unwanted characters
+    cleaned_text = pattern.sub('', text.lower())
+    return cleaned_text
 
 # Define the directory containing the original files and the directory to store results
 input_directory = '2024_stt'
@@ -33,7 +36,8 @@ for filename in os.listdir(input_directory):
             else:
                 text_part = line.strip()
 
-            # Remove '>>>', '>>', and additional special characters including musical notes
+            # Remove '>>>', '>>', and additional special characters including musical notes but preserve periods
+            # Convert to lowercase
             text_part = clean_text(text_part.replace('>>>', '').replace('>>', '').strip())
             
             if text_part:
