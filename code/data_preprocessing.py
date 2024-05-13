@@ -1,4 +1,13 @@
 import os
+import re
+
+def clean_text(text):
+    # Regex pattern to remove special characters except periods (.)
+    # It specifically targets musical note symbols (♪) and other unwanted non-alphanumeric symbols
+    pattern = re.compile(r'[^\w\s\.]|[\u266A]', re.UNICODE)  # Keeps periods, removes musical notes and other non-word, non-space characters
+    # Convert text to lowercase before removing unwanted characters
+    cleaned_text = pattern.sub('', text.lower())
+    return cleaned_text
 
 # Define the directory containing the original files and the directory to store results
 input_directory = '2024_stt'
@@ -17,7 +26,7 @@ for filename in os.listdir(input_directory):
         with open(file_path, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        # Process the text to remove timestamps and special characters, then join them into a single paragraph
+        # Process the text to remove timestamps, special characters including musical notes, then join them into a single paragraph
         processed_text = []
         current_sentence = []
 
@@ -27,8 +36,9 @@ for filename in os.listdir(input_directory):
             else:
                 text_part = line.strip()
 
-            # Remove unwanted characters
-            text_part = text_part.replace('>>>', '').replace('>>', '').strip()
+            # Remove '>>>', '>>', and additional special characters including musical notes but preserve periods
+            # Convert to lowercase
+            text_part = clean_text(text_part.replace('>>>', '').replace('>>', '').strip())
             
             if text_part:
                 current_sentence.append(text_part)
