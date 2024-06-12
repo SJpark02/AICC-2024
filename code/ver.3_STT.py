@@ -13,7 +13,7 @@ import glob
 # 1. mp4 -> mp3 변환
 ####################################################################
 # 동영상 파일 경로
-video_path = "your media file path in local"
+video_path = "noise_separation"
 # 저장할 폴더 경로
 output_folder = "your local folder to save converted audio file "
 
@@ -43,7 +43,6 @@ for i in range(num_clips):
     audio_clip.write_audiofile(output_path, codec='pcm_s16le')  # WAV 형식으로 저장
 
 print(f"분할 완료: 총 {num_clips}개의 파일이 생성되었습니다.")
-
 ####################################################################
 
 
